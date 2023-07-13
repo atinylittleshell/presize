@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Qwik",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "ES2017",
+    "module": "ES2022",
+    "lib": [
+      "es2022",
+      "DOM",
+      "WebWorker",
+      "DOM.Iterable"
+    ],
+    "jsx": "react-jsx",
+    "jsxImportSource": "@builder.io/qwik",
+    "declaration": false,
+    "declarationMap": false,
+    "incremental": true,
+    "noEmit": true,
+    "outDir": "tmp",
+    "resolveJsonModule": true,
+    "strict": true
+  }
+}

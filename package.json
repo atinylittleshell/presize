@@ -1,0 +1,11 @@
+{
+  "name": "monorepo",
+  "private": true,
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.44.0",
+    "eslint-config-custom": "workspace:*",
+    "prettier": "^2.8.8"
+  },
+  "packageManager": "pnpm@8.6.2"
+}

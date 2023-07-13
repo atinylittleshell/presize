@@ -1,0 +1,20 @@
+{
+  "extends": "tsconfig/qwik.json",
+  "compilerOptions": {
+    "paths": {
+      "~/*": [
+        "./src/*"
+      ]
+    }
+  },
+  "include": [
+    "src",
+    "./*.d.ts",
+    "./.eslintrc.cjs",
+    "./**/*.config.ts",
+    "./**/*.config.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

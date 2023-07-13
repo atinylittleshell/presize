@@ -1,0 +1,37 @@
+name: build
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os:
+          - ubuntu
+        node-version:
+          - '16.x'
+
+    name: build
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.2
+          run_install: true
+      - name: run build
+        run: pnpm -r build
+      - name: run lint
+        run: pnpm -r lint
