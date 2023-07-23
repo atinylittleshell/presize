@@ -5,7 +5,7 @@ import AvatarEditor from 'react-avatar-editor';
 import { useDropzone } from 'react-dropzone';
 import { typeid } from 'typeid-js';
 
-import { ProcessedImage, Size } from '~/lib/types';
+import { OutputSizingMode, ProcessedImage, Size } from '~/lib/types';
 
 import ImageItem from './ImageItem';
 
@@ -42,9 +42,9 @@ function TbCheck(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-const getImageBlobFromEditor = (editor: AvatarEditor, type: string) => {
+const getImageBlobFromEditor = (editor: AvatarEditor, type: string, sizingMode: OutputSizingMode) => {
   return new Promise<Blob>((resolve, reject) => {
-    editor.getImageScaledToCanvas().toBlob((blob) => {
+    (sizingMode === 'fixed_size' ? editor.getImageScaledToCanvas() : editor.getImage()).toBlob((blob) => {
       if (blob) {
         resolve(blob);
       } else {
@@ -57,9 +57,11 @@ const getImageBlobFromEditor = (editor: AvatarEditor, type: string) => {
 function ImageSelectorImpl({
   onLoad,
   outputSize,
+  outputSizingMode,
 }: {
   onLoad: (provider: (imageType: string) => Promise<ProcessedImage[]>) => void;
   outputSize: Size;
+  outputSizingMode: OutputSizingMode;
 }) {
   const [files, setFiles] = useState<ImageFile[]>([]);
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
@@ -93,7 +95,7 @@ function ImageSelectorImpl({
           results.push({
             id: file.id,
             file: file.file,
-            blob: await getImageBlobFromEditor(file.editorRef, imageType),
+            blob: await getImageBlobFromEditor(file.editorRef, imageType, outputSizingMode),
           });
         }
       }
@@ -101,7 +103,7 @@ function ImageSelectorImpl({
     };
 
     onLoad(provider);
-  }, [files]);
+  }, [files, outputSizingMode, onLoad]);
 
   return (
     <div

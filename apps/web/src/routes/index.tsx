@@ -8,7 +8,7 @@ import { typeid } from 'typeid-js';
 import { ImageSelector } from '~/components/ImageSelector';
 import { useImageSelectorContext } from '~/components/ImageSelectorContext';
 import { APP_NAME, DEFAULT_HEAD } from '~/lib/constants';
-import { OutputFormat } from '~/lib/types';
+import { OutputFormat, OutputSizingMode } from '~/lib/types';
 
 export const head: DocumentHead = DEFAULT_HEAD;
 
@@ -18,9 +18,23 @@ export default component$(() => {
   return (
     <div class="w-screen min-h-screen p-4 flex flex-col-reverse lg:flex-row lg:items-start gap-4 overflow-y-auto">
       <div class="flex flex-col lg:sticky lg:top-0">
-        <div class="rounded-box shadow-xl bg-base-200 flex flex-col gap-4 p-4">
+        <div class="rounded-box shadow-xl bg-base-200 flex flex-col gap-2 p-4">
           <div class="text-2xl font-bold">{APP_NAME}</div>
           <div class="flex lg:flex-col lg:w-64 gap-2">
+            <div class="form-control w-full">
+              <label class="label">
+                <span class="label-text">Output</span>
+              </label>
+              <select
+                class="select select-bordered"
+                onChange$={(e) => {
+                  imageSelectorContext.outputSizingMode = e.target.value as OutputSizingMode;
+                }}
+              >
+                <option value="fixed_size">Fixed Size</option>
+                <option value="fixed_aspect_ratio">Fixed Aspect Ratio</option>
+              </select>
+            </div>
             <div class="form-control w-full">
               <label class="label">
                 <span class="label-text">Width</span>
@@ -53,9 +67,11 @@ export default component$(() => {
                 }}
               />
             </div>
+          </div>
+          <div class="flex lg:flex-col lg:w-64 gap-2">
             <div class="form-control w-full">
               <label class="label">
-                <span class="label-text">Output</span>
+                <span class="label-text">Format</span>
               </label>
               <select
                 class="select select-bordered"
@@ -68,59 +84,61 @@ export default component$(() => {
               </select>
             </div>
           </div>
-          <button
-            class="btn btn-block btn-neutral"
-            disabled={!imageSelectorContext.imageProvider || imageSelectorContext.processing}
-            onClick$={async () => {
-              if (!imageSelectorContext.imageProvider || imageSelectorContext.processing) {
-                return;
-              }
-
-              imageSelectorContext.processing = true;
-
-              const results = await imageSelectorContext.imageProvider(`image/${imageSelectorContext.outputFormat}`);
-              if (!results.length) {
-                window.alert('Please select at least one image.');
-                imageSelectorContext.processing = false;
-                return;
-              }
-
-              const zip = new JSZip();
-              const existingNames = new Set<string>();
-              for (const result of results) {
-                let fileName = result.file.name;
-                if (existingNames.has(fileName)) {
-                  fileName = `${typeid().toString()}_${fileName}`;
+          <div class="flex lg:flex-col lg:w-64 gap-2 pt-2">
+            <button
+              class="btn btn-block btn-neutral"
+              disabled={!imageSelectorContext.imageProvider || imageSelectorContext.processing}
+              onClick$={async () => {
+                if (!imageSelectorContext.imageProvider || imageSelectorContext.processing) {
+                  return;
                 }
-                existingNames.add(fileName);
 
-                const newFileName = fileName.replace(/\.[^.]+$/, '') + `.${imageSelectorContext.outputFormat}`;
-                zip.file(newFileName, result.blob);
-              }
+                imageSelectorContext.processing = true;
 
-              const zipBlob = await zip.generateAsync({ type: 'blob' });
-              const zipUrl = URL.createObjectURL(zipBlob);
+                const results = await imageSelectorContext.imageProvider(`image/${imageSelectorContext.outputFormat}`);
+                if (!results.length) {
+                  window.alert('Please select at least one image.');
+                  imageSelectorContext.processing = false;
+                  return;
+                }
 
-              const hiddenLink = document.createElement('a');
-              hiddenLink.style.display = 'none';
-              hiddenLink.href = zipUrl;
-              hiddenLink.download = `Presize.io_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.zip`;
-              document.body.appendChild(hiddenLink);
+                const zip = new JSZip();
+                const existingNames = new Set<string>();
+                for (const result of results) {
+                  let fileName = result.file.name;
+                  if (existingNames.has(fileName)) {
+                    fileName = `${typeid().toString()}_${fileName}`;
+                  }
+                  existingNames.add(fileName);
 
-              hiddenLink.click();
+                  const newFileName = fileName.replace(/\.[^.]+$/, '') + `.${imageSelectorContext.outputFormat}`;
+                  zip.file(newFileName, result.blob);
+                }
 
-              mixpanel.track('downloaded');
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                const zipUrl = URL.createObjectURL(zipBlob);
 
-              window.setTimeout(() => {
-                document.body.removeChild(hiddenLink);
-                URL.revokeObjectURL(zipUrl);
-                imageSelectorContext.processing = false;
-              }, 1000);
-            }}
-          >
-            {imageSelectorContext.processing && <span class="loading loading-spinner"></span>}
-            {imageSelectorContext.processing ? 'Processing...' : 'Save as zip'}
-          </button>
+                const hiddenLink = document.createElement('a');
+                hiddenLink.style.display = 'none';
+                hiddenLink.href = zipUrl;
+                hiddenLink.download = `Presize.io_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.zip`;
+                document.body.appendChild(hiddenLink);
+
+                hiddenLink.click();
+
+                mixpanel.track('downloaded');
+
+                window.setTimeout(() => {
+                  document.body.removeChild(hiddenLink);
+                  URL.revokeObjectURL(zipUrl);
+                  imageSelectorContext.processing = false;
+                }, 1000);
+              }}
+            >
+              {imageSelectorContext.processing && <span class="loading loading-spinner"></span>}
+              {imageSelectorContext.processing ? 'Processing...' : 'Save as zip'}
+            </button>
+          </div>
         </div>
         <div class="divider"></div>
         <div class="self-center scale-90 flex flex-col">
@@ -146,6 +164,7 @@ export default component$(() => {
             imageSelectorContext.imageProvider = noSerialize(provider);
           }}
           outputSize={imageSelectorContext.outputSize}
+          outputSizingMode={imageSelectorContext.outputSizingMode}
         />
       </div>
     </div>
