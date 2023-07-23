@@ -5,6 +5,7 @@ import JSZip from 'jszip';
 import mixpanel from 'mixpanel-browser';
 import { typeid } from 'typeid-js';
 
+import { TbBrandGithubFilled, TbBrandTwitterFilled } from '~/components/common-ui/icons';
 import { ImageSelector } from '~/components/ImageSelector';
 import { useImageSelectorContext } from '~/components/ImageSelectorContext';
 import { APP_NAME, DEFAULT_HEAD } from '~/lib/constants';
@@ -141,6 +142,18 @@ export default component$(() => {
           </div>
         </div>
         <div class="divider"></div>
+        <div class="self-center flex">
+          <a
+            class="btn btn-ghost btn-square text-2xl"
+            href="https://github.com/atinylittleshell/presize"
+            target="_blank"
+          >
+            <TbBrandGithubFilled />
+          </a>
+          <a class="btn btn-ghost btn-square text-2xl" href="https://twitter.com/onelittleshell" target="_blank">
+            <TbBrandTwitterFilled />
+          </a>
+        </div>
         <div class="self-center scale-90 flex flex-col">
           <script
             type="text/javascript"
