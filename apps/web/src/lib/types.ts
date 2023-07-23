@@ -15,3 +15,5 @@ export type Size = {
 };
 
 export type OutputFormat = 'png' | 'jpeg';
+
+export type OutputSizingMode = 'fixed_size' | 'fixed_aspect_ratio';
