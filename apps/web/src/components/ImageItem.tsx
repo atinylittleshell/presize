@@ -1,5 +1,5 @@
 /** @jsxImportSource react */
-import { forwardRef, Ref, SVGProps, useCallback, useEffect, useRef, useState } from 'react';
+import { forwardRef, Ref, SVGProps, useCallback, useState } from 'react';
 import AvatarEditor from 'react-avatar-editor';
 
 import { Size } from '~/lib/types';
@@ -19,6 +19,21 @@ function TbX(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function TbZoomIn(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}>
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m4 0h6m-3-3v6m11 8l-6-6"
+      ></path>
+    </svg>
+  );
+}
+
 const ImageItem = (
   {
     file,
@@ -29,31 +44,12 @@ const ImageItem = (
   ref: Ref<AvatarEditor>,
 ) => {
   const [scale, setScaleImpl] = useState(1);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [minScalePerc, setMinScalePerc] = useState(1);
+  const [maxScalePerc, setMaxScalePerc] = useState(1);
 
   const setScale = useCallback((value: number) => {
     setScaleImpl(parseFloat(value.toFixed(2)));
   }, []);
-  const changeScaleBy = useCallback((delta: number) => {
-    setScaleImpl((prev) => parseFloat((prev + delta).toFixed(2)));
-  }, []);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      const onWheel = (e: WheelEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const delta = e.deltaY > 0 ? 0.01 : -0.01;
-        changeScaleBy(delta);
-      };
-      container.addEventListener('wheel', onWheel, { passive: false });
-      return () => {
-        container.removeEventListener('wheel', onWheel);
-      };
-    }
-  }, [changeScaleBy]);
 
   return (
     <div
@@ -69,7 +65,6 @@ const ImageItem = (
         }}
       >
         <div
-          ref={containerRef}
           style={{
             scale: thumbnailScale.toFixed(2),
           }}
@@ -81,6 +76,14 @@ const ImageItem = (
             height={outputSize.height}
             border={0}
             scale={scale}
+            onLoadSuccess={(image) => {
+              setMinScalePerc(
+                Math.ceil((Math.min(image.width, image.height) / Math.max(image.width, image.height)) * 100),
+              );
+              setMaxScalePerc(
+                Math.floor(Math.min(image.resource.width / image.width, image.resource.height / image.height) * 100),
+              );
+            }}
           />
         </div>
       </figure>
@@ -96,38 +99,38 @@ const ImageItem = (
             <TbX />
           </button>
         </div>
-        <div className="flex justify-center">
-          <div className="join">
-            <button
-              className="join-item btn btn-xs btn-ghost"
-              onClick={() => {
-                changeScaleBy(-0.01);
-              }}
-            >
-              -
-            </button>
-            <input
-              type="text"
-              className="join-item input input-xs text-center w-full"
-              value={(scale * 100).toFixed() + '%'}
-              onChange={(e) => {
-                const scale = parseFloat(e.target.value.replace('%', '')) / 100;
-                if (isNaN(scale) || scale < 0) {
-                  setScale(1);
-                } else {
-                  setScale(scale);
-                }
-              }}
-            />
-            <button
-              className="join-item btn btn-xs btn-ghost"
-              onClick={() => {
-                changeScaleBy(0.01);
-              }}
-            >
-              +
-            </button>
+        <div className="flex items-center gap-2">
+          <div className="text-lg">
+            <TbZoomIn />
           </div>
+          <input
+            type="range"
+            min={minScalePerc}
+            max={maxScalePerc}
+            value={scale * 100}
+            className="range range-xs flex-1"
+            onChange={(e) => {
+              const scale = parseFloat(e.target.value) / 100;
+              if (isNaN(scale) || scale < 0) {
+                setScale(1);
+              } else {
+                setScale(scale);
+              }
+            }}
+          />
+          <input
+            type="text"
+            className="input input-xs text-right w-12"
+            value={(((scale * 100 - minScalePerc) / (maxScalePerc - minScalePerc)) * 100).toFixed() + '%'}
+            onChange={(e) => {
+              const scale = parseFloat(e.target.value.replace('%', '')) / 100;
+              if (isNaN(scale) || scale < 0) {
+                setScale(1);
+              } else {
+                setScale(scale);
+              }
+            }}
+          />
         </div>
       </div>
     </div>
