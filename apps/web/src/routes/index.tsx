@@ -5,7 +5,7 @@ import JSZip from 'jszip';
 import mixpanel from 'mixpanel-browser';
 import { typeid } from 'typeid-js';
 
-import { TbBrandGithubFilled, TbBrandTwitterFilled } from '~/components/common-ui/icons';
+import { TbBrandGithubFilled, TbBrandTwitterFilled, TbInfoCircle } from '~/components/common-ui/icons';
 import { ImageSelector } from '~/components/ImageSelector';
 import { useImageSelectorContext } from '~/components/ImageSelectorContext';
 import { APP_NAME, DEFAULT_HEAD } from '~/lib/constants';
@@ -25,6 +25,14 @@ export default component$(() => {
             <div class="form-control w-full">
               <label class="label">
                 <span class="label-text">Output</span>
+                <span class="label-text">
+                  <div
+                    class="tooltip tooltip-bottom cursor-pointer"
+                    data-tip="Fixed Size allows you to produce output images with the exact dimensions as specified. Fixed Aspect Ratio allows the output images to match the specified aspect ratio but preserve maximum possible resolution."
+                  >
+                    <TbInfoCircle />
+                  </div>
+                </span>
               </label>
               <select
                 class="select select-bordered"
