@@ -115,7 +115,7 @@ function ImageSelectorImpl({
     >
       {!files.length ? (
         <div className="flex flex-col gap-4">
-          <div className="text-4xl font-bold text-center">Bulk Proprocess, Resize and Crop Your Images</div>
+          <div className="text-4xl font-bold text-center">Bulk Preprocess, Resize and Crop Your Images</div>
           <div className="flex flex-wrap gap-2 justify-center">
             <span className="badge badge-lg badge-success badge-outline flex gap-1" title="Free to use, forever.">
               Free

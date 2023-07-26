@@ -2,7 +2,7 @@
 
 
 <p align="center">
-Bulk Proprocess, Resize and Crop Your Images.
+Bulk Preprocess, Resize and Crop Your Images.
 </p>
 
 <p align="center">🌐 <a href="https://www.presize.io">Website</a></p>

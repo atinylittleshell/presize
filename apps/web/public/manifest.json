@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/web-manifest-combined.json",
-  "name": "Presize.io - Bulk Proprocess, Resize and Crop Your Images",
+  "name": "Presize.io - Bulk Preprocess, Resize and Crop Your Images",
   "short_name": "Presize.io",
   "description": "Presize.io is a free online tool to bulk crop and resize images. It is free, easy to use, and supports batch processing.",
   "start_url": ".",

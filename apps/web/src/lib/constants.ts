@@ -5,7 +5,7 @@ export const APP_NAME = 'Presize.io';
 export const LOCAL_STORAGE_PREFIX = 'presize';
 
 export const DEFAULT_HEAD = {
-  title: 'Presize.io - Bulk Proprocess, Resize and Crop Your Images',
+  title: 'Presize.io - Bulk Preprocess, Resize and Crop Your Images',
   meta: [
     {
       name: 'description',
