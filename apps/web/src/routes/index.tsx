@@ -18,7 +18,7 @@ export default component$(() => {
 
   return (
     <div class="w-screen min-h-screen p-4 flex flex-col-reverse lg:flex-row lg:items-start gap-4 overflow-y-auto">
-      <div class="flex flex-col lg:sticky lg:top-0">
+      <div class="flex flex-col lg:sticky lg:top-0 z-10">
         <div class="rounded-box shadow-xl bg-base-200 flex flex-col gap-2 p-4">
           <div class="text-2xl font-bold">{APP_NAME}</div>
           <div class="flex lg:flex-col lg:w-64 gap-2">
