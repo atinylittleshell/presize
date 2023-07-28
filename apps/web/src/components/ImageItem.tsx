@@ -1,8 +1,25 @@
 /** @jsxImportSource react */
-import { forwardRef, Ref, SVGProps, useCallback, useState } from 'react';
+import mixpanel from 'mixpanel-browser';
+import { forwardRef, Ref, SVGProps, useCallback, useRef, useState } from 'react';
 import AvatarEditor from 'react-avatar-editor';
 
-import { Size } from '~/lib/types';
+import { OutputFormat, OutputSizingMode, Size } from '~/lib/types';
+import { getImageBlobFromEditor } from '~/lib/utils';
+
+export function TbDownload(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" {...props}>
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 11l5 5l5-5m-5-7v12"
+      ></path>
+    </svg>
+  );
+}
 
 function TbX(props: SVGProps<SVGSVGElement>) {
   return (
@@ -38,11 +55,21 @@ const ImageItem = (
   {
     file,
     outputSize,
+    outputFormat,
+    outputSizingMode,
     thumbnailScale,
     onDelete,
-  }: { file: File; outputSize: Size; thumbnailScale: number; onDelete: () => void },
+  }: {
+    file: File;
+    outputSize: Size;
+    outputFormat: OutputFormat;
+    outputSizingMode: OutputSizingMode;
+    thumbnailScale: number;
+    onDelete: () => void;
+  },
   ref: Ref<AvatarEditor>,
 ) => {
+  const editorRef = useRef<AvatarEditor | null>(null);
   const [scale, setScaleImpl] = useState(1);
   const [minScalePerc, setMinScalePerc] = useState(1);
   const [maxScalePerc, setMaxScalePerc] = useState(1);
@@ -71,7 +98,12 @@ const ImageItem = (
         >
           <AvatarEditor
             image={file}
-            ref={ref}
+            ref={(el) => {
+              editorRef.current = el;
+              if (typeof ref === 'function') {
+                ref(el);
+              }
+            }}
             width={outputSize.width}
             height={outputSize.height}
             border={0}
@@ -90,6 +122,27 @@ const ImageItem = (
       <div className="card-body">
         <div className="w-full flex justify-center gap-1">
           <div className="truncate">{file.name}</div>
+          <button
+            className="btn btn-xs btn-square"
+            onClick={async () => {
+              if (!editorRef.current) return;
+
+              const blob = await getImageBlobFromEditor(editorRef.current, outputFormat, outputSizingMode);
+              const blobUrl = URL.createObjectURL(blob);
+
+              const hiddenLink = document.createElement('a');
+              hiddenLink.style.display = 'none';
+              hiddenLink.href = blobUrl;
+              hiddenLink.download = file.name;
+              document.body.appendChild(hiddenLink);
+
+              hiddenLink.click();
+
+              mixpanel.track('downloaded');
+            }}
+          >
+            <TbDownload />
+          </button>
           <button
             className="btn btn-xs btn-square"
             onClick={() => {

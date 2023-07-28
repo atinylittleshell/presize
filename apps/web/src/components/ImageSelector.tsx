@@ -5,7 +5,8 @@ import AvatarEditor from 'react-avatar-editor';
 import { useDropzone } from 'react-dropzone';
 import { typeid } from 'typeid-js';
 
-import { OutputSizingMode, ProcessedImage, Size } from '~/lib/types';
+import { OutputFormat, OutputSizingMode, ProcessedImage, Size } from '~/lib/types';
+import { getImageBlobFromEditor } from '~/lib/utils';
 
 import ImageItem from './ImageItem';
 
@@ -42,26 +43,16 @@ function TbCheck(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-const getImageBlobFromEditor = (editor: AvatarEditor, type: string, sizingMode: OutputSizingMode) => {
-  return new Promise<Blob>((resolve, reject) => {
-    (sizingMode === 'fixed_size' ? editor.getImageScaledToCanvas() : editor.getImage()).toBlob((blob) => {
-      if (blob) {
-        resolve(blob);
-      } else {
-        reject(new Error('Error converting image to blob'));
-      }
-    }, type);
-  });
-};
-
 function ImageSelectorImpl({
   onLoad,
   outputSize,
   outputSizingMode,
+  outputFormat,
 }: {
   onLoad: (provider: (imageType: string) => Promise<ProcessedImage[]>) => void;
   outputSize: Size;
   outputSizingMode: OutputSizingMode;
+  outputFormat: OutputFormat;
 }) {
   const [files, setFiles] = useState<ImageFile[]>([]);
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
@@ -179,6 +170,8 @@ function ImageSelectorImpl({
           key={file.id}
           file={file.file}
           outputSize={outputSize}
+          outputSizingMode={outputSizingMode}
+          outputFormat={outputFormat}
           thumbnailScale={thumbnailScale}
           onDelete={() => {
             setFiles((prev) => prev.filter((f) => f.id !== file.id));

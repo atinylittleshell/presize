@@ -186,6 +186,7 @@ export default component$(() => {
           }}
           outputSize={imageSelectorContext.outputSize}
           outputSizingMode={imageSelectorContext.outputSizingMode}
+          outputFormat={imageSelectorContext.outputFormat}
         />
       </div>
     </div>
