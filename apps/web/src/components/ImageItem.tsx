@@ -51,6 +51,26 @@ export function TbZoomIn(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function TbRotate(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      strokeWidth="2"
+      stroke="currentColor"
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M19.95 11a8 8 0 1 0 -.5 4m.5 5v-5h-5" />
+    </svg>
+  );
+}
+
 const ImageItem = (
   {
     file,
@@ -73,9 +93,14 @@ const ImageItem = (
   const [scale, setScaleImpl] = useState(1);
   const [minScalePerc, setMinScalePerc] = useState(1);
   const [maxScalePerc, setMaxScalePerc] = useState(1);
+  const [rotation, setRotationImpl] = useState(0);
 
   const setScale = useCallback((value: number) => {
     setScaleImpl(parseFloat(value.toFixed(2)));
+  }, []);
+
+  const setRotation = useCallback((value: number) => {
+    setRotationImpl(parseFloat(value.toFixed(1)));
   }, []);
 
   return (
@@ -108,6 +133,7 @@ const ImageItem = (
             height={outputSize.height}
             border={0}
             scale={scale}
+            rotate={rotation}
             onLoadSuccess={(image) => {
               setMinScalePerc(
                 Math.ceil((Math.min(image.width, image.height) / Math.max(image.width, image.height)) * 100),
@@ -181,6 +207,39 @@ const ImageItem = (
                 setScale(1);
               } else {
                 setScale(scale);
+              }
+            }}
+          />
+        </div>
+        <div className="flex items-center gap-2 mt-2">
+          <div className="text-lg">
+            <TbRotate />
+          </div>
+          <input
+            type="range"
+            min={-180}
+            max={180}
+            value={rotation}
+            className="range range-xs flex-1"
+            onChange={(e) => {
+              const rot = parseFloat(e.target.value);
+              if (isNaN(rot)) {
+                setRotation(0);
+              } else {
+                setRotation(rot);
+              }
+            }}
+          />
+          <input
+            type="text"
+            className="input input-xs text-right w-12"
+            value={rotation.toFixed(0) + '°'}
+            onChange={(e) => {
+              const rot = parseFloat(e.target.value.replace('°', ''));
+              if (isNaN(rot)) {
+                setRotation(0);
+              } else {
+                setRotation(rot);
               }
             }}
           />
