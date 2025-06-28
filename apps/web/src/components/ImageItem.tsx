@@ -71,6 +71,15 @@ export function TbRotate(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+function removeExtension(filename: string): string {
+  const lastDotIndex = filename.lastIndexOf('.');
+  if (lastDotIndex === -1) {
+    // No extension found
+    return filename;
+  }
+  return filename.substring(0, lastDotIndex);
+}
+
 const ImageItem = (
   {
     file,
@@ -147,19 +156,20 @@ const ImageItem = (
       </figure>
       <div className="card-body">
         <div className="w-full flex justify-center gap-1">
-          <div className="truncate">{file.name}</div>
+          <div className="truncate">{removeExtension(file.name)}</div>
           <button
             className="btn btn-xs btn-square"
             onClick={async () => {
               if (!editorRef.current) return;
 
-              const blob = await getImageBlobFromEditor(editorRef.current, outputFormat, outputSizingMode);
+              const blob = await getImageBlobFromEditor(editorRef.current, `image/${outputFormat}`, outputSizingMode);
               const blobUrl = URL.createObjectURL(blob);
 
               const hiddenLink = document.createElement('a');
               hiddenLink.style.display = 'none';
               hiddenLink.href = blobUrl;
-              hiddenLink.download = file.name;
+              const newFileName = removeExtension(file.name) + `.${outputFormat}`;
+              hiddenLink.download = newFileName;
               document.body.appendChild(hiddenLink);
 
               hiddenLink.click();
