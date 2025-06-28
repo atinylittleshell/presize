@@ -1,6 +1,5 @@
 {
   "name": "monorepo",
-  "private": true,
   "license": "MIT",
   "devDependencies": {
     "eslint": "^8.44.0",
