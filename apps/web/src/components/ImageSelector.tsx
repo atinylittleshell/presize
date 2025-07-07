@@ -161,6 +161,9 @@ function ImageSelectorImpl({
         <button className="btn" onClick={open}>
           Add Files
         </button>
+        <div className="text-center font-semibold">
+          {files.length} image{files.length === 1 ? '' : 's'} selected
+        </div>
       </div>
       {files.map((file) => (
         <ImageItem
